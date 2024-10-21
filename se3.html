@@ -89,7 +89,7 @@
     </header>
     <div class="container">
         <form id="flight-search-form">
-                        <div class="form-group">
+                                    <div class="form-group">
                 <label for="trip-type">Trip Type:</label>
                 <select id="trip-type" name="trip-type" required>
                     <option value="one-way" selected>One Way</option>
@@ -205,18 +205,13 @@
                     <div><strong>Airline:</strong> ${validatingAirline}</div>
                     <div style="display: flex; flex-wrap: wrap; justify-content: space-between;">
                         <div class="left">
-                            <p>Departure:</p>
-                            <p>${departureSegment.departure.iataCode} at ${departureSegment.departure.at}</p>
-                            <p>Arrival:</p>
-                            <p>${arrivalSegment.arrival.iataCode} at ${arrivalSegment.arrival.at}</p>
+                            <p>Departure: ${departureSegment.departure.iataCode} at ${departureSegment.departure.at}</p>
+                            <p>Arrival: ${arrivalSegment.arrival.iataCode} at ${arrivalSegment.arrival.at}</p>
                         </div>
                         <div class="right">
-                            <p>Duration:</p>
-                            <p>${duration}</p>
-                            <p>Stops:</p>
+                            <p>Duration: ${duration}</p>
                             <p>${stops} stop(s)</p>
-                            <p>Price:</p>
-                            <p>${price}</p>
+                            <p>Price: ${price}</p>
                         </div>
                     </div>
                 `;
