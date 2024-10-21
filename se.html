@@ -1,0 +1,91 @@
+<script>
+    const client_id = 'bqK2WFXiBzkXDGoB3nQsrYQsReZUhc51';
+    const client_secret = 'BMhUjAxVvoEX0CLT';
+
+    function getAccessToken() {
+        return fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `grant_type=client_credentials&client_id=${client_id}&client_secret=${client_secret}`
+        })
+            .then(response => response.json())
+            .then(data => data.access_token)
+            .catch(error => console.error('Error:', error));
+    }
+
+    function handleFormSubmission(event) {
+        event.preventDefault();
+
+        const tripType = document.getElementById('trip-type').value;
+        const from = document.getElementById('from').value;
+        const to = document.getElementById('to').value;
+        const departureDate = document.getElementById('departure-date').value;
+        const returnDate = document.getElementById('return-date').value;
+        const travelClass = document.getElementById('travel-class').value;
+        const adults = document.getElementById('adults').value;
+        const children = document.getElementById('children').value;
+
+        getAccessToken().then(accessToken => {
+            let url = `https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=${from}&destinationLocationCode=${to}&departureDate=${departureDate}&adults=${adults}&travelClass=${travelClass}`;
+
+            if (tripType === 'return' && returnDate) {
+                url += `&returnDate=${returnDate}`;
+            }
+
+            if (children > 0) {
+                url += `&children=${children}`;
+            }
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = '';
+                    data.data.forEach(offer => {
+                        const itineraries = offer.itineraries.map(itinerary => {
+                            const segments = itinerary.segments.map(segment => {
+                                return `
+                                    <div>
+                                        <p><strong>Departure:</strong> ${segment.departure.iataCode} at ${segment.departure.at}</p>
+                                        <p><strong>Arrival:</strong> ${segment.arrival.iataCode} at ${segment.arrival.at}</p>
+                                        <p><strong>Carrier Code:</strong> ${segment.carrierCode}</p>
+                                        <p><strong>Flight Number:</strong> ${segment.number}</p>
+                                        <p><strong>Aircraft:</strong> ${segment.aircraft.code}</p>
+                                        <p><strong>Duration:</strong> ${segment.duration}</p>
+                                    </div>
+                                `;
+                            }).join('');
+
+                            return `
+                                <div>
+                                    <p><strong>Duration:</strong> ${itinerary.duration}</p>
+                                    ${segments}
+                                </div>
+                            `;
+                        }).join('');
+
+                        const offerDiv = document.createElement('div');
+                        offerDiv.className = 'flight-offer';
+                        offerDiv.innerHTML = `
+                            <p><strong>Airline:</strong> ${offer.validatingAirlineCodes.join(', ')}</p>
+                            <p>${offer.itineraries[0].segments[0].departure.at} - ${offer.itineraries[0].segments.slice(-1)[0].arrival.at}</p>
+                            <p>${from} - ${to}</p>
+                            <p>${offer.itineraries[0].segments.length - 1} stop ${offer.itineraries[0].duration}</p>
+                            <p><strong>Price:</strong> ${offer.price.total} ${offer.price.currency}</p>
+                        `;
+                        resultsDiv.appendChild(offerDiv);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    }
+
+    document.getElementById('flight-search-form').addEventListener('submit', handleFormSubmission);
+</script>
