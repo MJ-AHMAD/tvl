@@ -71,6 +71,12 @@
             display: flex;
             justify-content: space-between;
         }
+        .left, .right {
+            flex: 1;
+        }
+        .right p {
+            text-align: right;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@amadeus/amadeus-js"></script>
 </head>
@@ -80,7 +86,7 @@
     </header>
     <div class="container">
         <form id="flight-search-form">
-                        <div class="form-group">
+                            <div class="form-group">
                 <label for="trip-type">Trip Type:</label>
                 <select id="trip-type" name="trip-type" required>
                     <option value="one-way" selected>One Way</option>
@@ -190,18 +196,23 @@
                 const arrivalSegment = offer.itineraries[0].segments.slice(-1)[0];
                 const duration = offer.itineraries[0].duration;
                 const stops = offer.itineraries[0].segments.length - 1;
-                const price = `${offer.price.total} ${offer.price.currency}`;
+                const price = `<strong>${offer.price.total} ${offer.price.currency}</strong>`;
                 
                 offerDiv.innerHTML = `
                     <div><strong>Airline:</strong> ${validatingAirline}</div>
-                    <div>
-                        <div>
-                            <p>${departureSegment.departure.iataCode} - ${arrivalSegment.arrival.iataCode}</p>
-                            <p>${departureSegment.departure.at} - ${arrivalSegment.arrival.at}</p>
+                    <div style="display: flex;">
+                        <div class="left">
+                            <p>Departure:</p>
+                            <p>${departureSegment.departure.iataCode} at ${departureSegment.departure.at}</p>
+                            <p>Arrival:</p>
+                            <p>${arrivalSegment.arrival.iataCode} at ${arrivalSegment.arrival.at}</p>
                         </div>
-                        <div>
+                        <div class="right">
+                            <p>Duration:</p>
                             <p>${duration}</p>
+                            <p>Stops:</p>
                             <p>${stops} stop(s)</p>
+                            <p>Price:</p>
                             <p>${price}</p>
                         </div>
                     </div>
@@ -214,3 +225,4 @@
     </script>
 </body>
 </html>
+
